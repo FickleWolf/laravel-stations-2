@@ -7,27 +7,28 @@
     <title>Admin</title>
 </head>
 <body>
-<table>
-    <thead>
-        <tr>
-            <th>タイトル</th>
-            <th>公開年</th>
-            <th>上映状況</th>
-            <th>概要</th>
-            <th>画像</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($movies as $movie)
+    <a href='/admin/movies/create'>映画の作成</a>
+    <table>
+        <thead>
             <tr>
-                <td>{{ $movie->title }}</td>
-                <td>{{ $movie->published_year }}年</td>
-                <td>{{ ($movie->is_showing) ? '上映中' : '上映予定' }}</td>
-                <td>{{ $movie->description }}</td>
-                <td><img src='{{ $movie->image_url }}'/></td>
+                <th>タイトル</th>
+                <th>公開年</th>
+                <th>上映状況</th>
+                <th>概要</th>
+                <th>画像</th>
             </tr>
-        @endforeach
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach ($movies as $movie)
+                <tr>
+                    <td>{{ $movie->title }}</td>
+                    <td>{{ $movie->published_year }}年</td>
+                    <td>{{ ($movie->is_showing) ? '上映中' : '上映予定' }}</td>
+                    <td>{{ $movie->description }}</td>
+                    <td><img src='{{ $movie->image_url }}'/></td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 </body>
 </html>
