@@ -13,7 +13,7 @@ class CreateMovieTable extends Migration
      */
     public function up()
     {
-        Schema::create('movie', function (Blueprint $table) {
+        Schema::create('movies', function (Blueprint $table) {
             $table->id();
             $table->text('title')->comment('映画のタイトル');
             $table->text('image_url')->comment('画像URL');
