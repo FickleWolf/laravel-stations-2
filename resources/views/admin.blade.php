@@ -26,6 +26,7 @@
                     <td>{{ ($movie->is_showing) ? '上映中' : '上映予定' }}</td>
                     <td>{{ $movie->description }}</td>
                     <td><img src='{{ $movie->image_url }}'/></td>
+                    <td><a href='/admin/movies/{{ $movie->id }}/edit'>編集</a></td>
                 </tr>
             @endforeach
         </tbody>

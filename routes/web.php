@@ -23,3 +23,7 @@ Route::get('/admin/movies', [MovieController::class, 'admin']);
 Route::get('/admin/movies/create', [MovieController::class, 'create']);
 
 Route::post('/admin/movies/store', [MovieController::class, 'store']);
+
+Route::get('/admin/movies/{id}/edit', [MovieController::class, 'edit']);
+
+Route::patch('/admin/movies/{id}/update',[MovieController::class, 'update']);
