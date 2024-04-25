@@ -8,11 +8,31 @@ use App\Rules\UniqueTitle;
 
 class MovieController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $movies = Movie::all();
-        return view('movie', ['movies' => $movies]);
+        try {
+            $keyword = $request->input('keyword');
+
+            $query = Movie::query()
+                ->when($request->has('is_showing'), function ($q) use ($request) {
+                    $q->where('is_showing', $request->input('is_showing') === '1');
+                })
+                ->when($keyword, function ($q) use ($keyword) {
+                    $q->where(function ($q) use ($keyword) {
+                        $q->where('title', 'like', "%$keyword%")
+                            ->orWhere('description', 'like', "%$keyword%");
+                    });
+                });
+
+            $movies = $query->paginate(20);
+
+            return view('movie', ['movies' => $movies]);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            return redirect()->back()->with('error', 'エラーが発生しました。');
+        }
     }
+
 
     public function admin()
     {
@@ -80,8 +100,11 @@ class MovieController extends Controller
             $movie = Movie::findOrFail($id);
             $movie->delete();
             return redirect('/admin/movies')->with('success', '映画が正常に削除されました。');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => '指定された映画が見つかりませんでした。'], 404);
         } catch (\Exception $e) {
             return redirect('/admin/movies')->with('error', '映画の削除中にエラーが発生しました。');
         }
     }
+
 }
