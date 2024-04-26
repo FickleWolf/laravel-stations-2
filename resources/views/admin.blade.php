@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="stylesheet" href="{{ mix('css/style.css') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -27,6 +28,7 @@
         <thead>
             <tr>
                 <th>タイトル</th>
+                <th>ジャンル</th>
                 <th>公開年</th>
                 <th>上映状況</th>
                 <th>概要</th>
@@ -37,10 +39,11 @@
             @foreach ($movies as $movie)
                 <tr>
                     <td>{{ $movie->title }}</td>
+                    <td>{{ $movie->genre->name }}</td>
                     <td>{{ $movie->published_year }}年</td>
                     <td>{{ ($movie->is_showing) ? '上映中' : '上映予定' }}</td>
                     <td>{{ $movie->description }}</td>
-                    <td><img src='{{ $movie->image_url }}'/></td>
+                    <td><img src='{{ $movie->image_url }}' id="movie_image"/></td>
                     <td><a href='/admin/movies/{{ $movie->id }}/edit'>編集</a></td>
                     <td>
                         <form action="/admin/movies/1000/destroy" method="POST" onsubmit="return confirmAction()">

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMovieTable extends Migration
+class CreateMoviesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,6 +16,8 @@ class CreateMovieTable extends Migration
         Schema::create('movies', function (Blueprint $table) {
             $table->bigIncrements('id')->unsigned();
             $table->string('title', 255)->unique()->comment('映画のタイトル');
+            $table->unsignedBigInteger('genre_id')->nullable();
+            $table->foreign('genre_id')->references('id')->on('genres');
             $table->text('image_url')->comment('画像URL');
             $table->integer('published_year')->nullable()->comment('公開年');
             $table->boolean('is_showing')->default(false)->comment('上映中かどうか');

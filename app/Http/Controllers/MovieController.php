@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Movie;
+use App\Models\Genre;
 use App\Rules\UniqueTitle;
 
 class MovieController extends Controller
@@ -47,23 +49,32 @@ class MovieController extends Controller
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'title' => ['required', 'string', 'max:255', new UniqueTitle],
-            'image_url' => 'required|url',
-            'published_year' => 'required|integer',
-            'is_showing' => 'boolean',
-            'description' => 'required|string',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'title' => ['required', 'string', 'max:255', new UniqueTitle],
+                'genre' => 'required|string',
+                'image_url' => 'required|url',
+                'published_year' => 'required|integer',
+                'is_showing' => 'boolean',
+                'description' => 'required|string',
+            ]);
+            DB::transaction(function () use ($validatedData) {
+                $genre = Genre::firstOrCreate(['name' => $validatedData['genre']]);
 
-        $movie = new Movie();
-        $movie->title = $validatedData['title'];
-        $movie->image_url = $validatedData['image_url'];
-        $movie->published_year = $validatedData['published_year'];
-        $movie->is_showing = $validatedData['is_showing'] ?? false;
-        $movie->description = $validatedData['description'];
-        $movie->save();
+                $movie = new Movie();
+                $movie->title = $validatedData['title'];
+                $movie->genre_id = $genre->id;
+                $movie->image_url = $validatedData['image_url'];
+                $movie->published_year = $validatedData['published_year'];
+                $movie->is_showing = $validatedData['is_showing'] ?? false;
+                $movie->description = $validatedData['description'];
+                $movie->save();
+            });
 
-        return redirect('/admin/movies')->with('success', '映画が正常に追加されました。');
+            return redirect('/admin/movies')->with('success', '映画が正常に追加されました.');
+        } catch (\Exception $e) {
+            return response()->json(['error' => '映画の追加に失敗しました。'], 500);
+        }
     }
 
     public function edit($id)
@@ -76,22 +87,41 @@ class MovieController extends Controller
     {
         $validatedData = $request->validate([
             'title' => ['required', 'string', 'max:255', new UniqueTitle],
+            'genre' => 'required|string',
             'image_url' => 'required|url',
             'published_year' => 'required|integer',
             'is_showing' => 'boolean',
             'description' => 'required|string',
         ]);
 
-        $movie = Movie::findOrFail($id);
+        DB::beginTransaction();
 
-        $movie->title = $validatedData['title'];
-        $movie->image_url = $validatedData['image_url'];
-        $movie->published_year = $validatedData['published_year'];
-        $movie->is_showing = $validatedData['is_showing'] ?? false;
-        $movie->description = $validatedData['description'];
-        $movie->save();
+        try {
+            $movie = Movie::findOrFail($id);
 
-        return redirect('/admin/movies')->with('success', '映画が正常に更新されました。');
+            $newGenre = Genre::firstOrCreate(['name' => $validatedData['genre']]);
+
+            $currentGenre = $movie->genre;
+
+            if ($currentGenre->id !== $newGenre->id) {
+                $movie->genre_id = $newGenre->id;
+            }
+
+            $movie->title = $validatedData['title'];
+            $movie->image_url = $validatedData['image_url'];
+            $movie->published_year = $validatedData['published_year'];
+            $movie->is_showing = $validatedData['is_showing'] ?? false;
+            $movie->description = $validatedData['description'];
+            $movie->save();
+
+            DB::commit();
+
+            return redirect('/admin/movies')->with('success', '映画が正常に更新されました。');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return back()->withInput()->withErrors(['error' => '映画の更新中にエラーが発生しました。']);
+        }
     }
 
     public function destroy($id)

@@ -24,6 +24,10 @@
             <input type="text" id="title" name="title" required>
             <br/>
 
+            <label for="title">ジャンル</label>
+            <input type="text" id="genre" name="genre" required>
+            <br/>
+
             <label for="image_url">画像URL</label>
             <input type="url" id="image_url" name="image_url" required>
             <br/>

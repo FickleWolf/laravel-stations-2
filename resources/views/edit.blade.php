@@ -24,6 +24,11 @@
             <input type="text" id="title" name="title" value="{{ $movie->title }}" required>
             <br/>
 
+            <label for="genre">ジャンル</label>
+            <input type="text" id="genre" name="genre" value="{{ $movie->genre ? $movie->genre->name : '' }}" required>
+            <br/>
+
+
             <label for="image_url">画像URL</label>
             <input type="url" id="image_url" name="image_url" value="{{ $movie->image_url }}" required>
             <br/>
