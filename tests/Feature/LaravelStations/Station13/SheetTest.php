@@ -16,7 +16,8 @@ class SheetTest extends TestCase
     public function testSeedコマンドでマスターデータが作成されるか(): void
     {
         $this->seed();
-        $this->assertEquals(Sheet::count(), 15);
+        $sheets = Sheet::all();
+        $this->assertEquals($sheets->count(), 15);
     }
 
     public function test座席一覧画面に全ての座席が表示されるか(): void
@@ -26,7 +27,7 @@ class SheetTest extends TestCase
         $response->assertStatus(200);
         $sheets = Sheet::all();
         foreach ($sheets as $sheet) {
-            $response->assertSeeText($sheet->row .'-'. $sheet->column);
+            $response->assertSeeText($sheet->row . '-' . $sheet->column);
         }
     }
 }

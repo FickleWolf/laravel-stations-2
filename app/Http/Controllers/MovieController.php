@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Movie;
 use App\Models\Genre;
+use App\Models\Sheet;
+use App\Models\Schedule;
 use App\Rules\UniqueTitle;
 
 class MovieController extends Controller
@@ -35,6 +37,13 @@ class MovieController extends Controller
         }
     }
 
+    public function detail($id)
+    {
+        $movie = Movie::findOrFail($id);
+        $schedules = $movie->schedules()->orderBy('start_time')->get();
+        return view('detail', ['movie' => $movie, 'schedules' => $schedules]);
+    }
+
 
     public function admin()
     {
@@ -48,34 +57,38 @@ class MovieController extends Controller
     }
 
     public function store(Request $request)
-    {
-        try {
-            $validatedData = $request->validate([
-                'title' => ['required', 'string', 'max:255', new UniqueTitle],
-                'genre' => 'required|string',
-                'image_url' => 'required|url',
-                'published_year' => 'required|integer',
-                'is_showing' => 'boolean',
-                'description' => 'required|string',
-            ]);
-            DB::transaction(function () use ($validatedData) {
-                $genre = Genre::firstOrCreate(['name' => $validatedData['genre']]);
+{
+    $validatedData = $request->validate([
+        'title' => ['required', 'string', 'max:255', new UniqueTitle],
+        'genre' => 'required|string',
+        'image_url' => 'required|url',
+        'published_year' => 'required|integer',
+        'is_showing' => 'boolean',
+        'description' => 'required|string',
+    ]);
+    try {
+        DB::beginTransaction(); // トランザクション開始
 
-                $movie = new Movie();
-                $movie->title = $validatedData['title'];
-                $movie->genre_id = $genre->id;
-                $movie->image_url = $validatedData['image_url'];
-                $movie->published_year = $validatedData['published_year'];
-                $movie->is_showing = $validatedData['is_showing'] ?? false;
-                $movie->description = $validatedData['description'];
-                $movie->save();
-            });
+        $genre = Genre::firstOrCreate(['name' => $validatedData['genre']]);
 
-            return redirect('/admin/movies')->with('success', '映画が正常に追加されました.');
-        } catch (\Exception $e) {
-            return response()->json(['error' => '映画の追加に失敗しました。'], 500);
-        }
+        $movie = new Movie();
+        $movie->title = $validatedData['title'];
+        $movie->genre_id = $genre->id;
+        $movie->image_url = $validatedData['image_url'];
+        $movie->published_year = $validatedData['published_year'];
+        $movie->is_showing = $validatedData['is_showing'] ?? false;
+        $movie->description = $validatedData['description'];
+        $movie->save();
+
+        DB::commit(); // トランザクションをコミット
+
+        return redirect('/admin/movies')->with('success', '映画が正常に追加されました.');
+    } catch (\Exception $e) {
+        DB::rollback(); // トランザクションをロールバック
+        return response()->json(['error' => '映画の追加に失敗しました。'], 500);
     }
+}
+
 
     public function edit($id)
     {
@@ -137,4 +150,9 @@ class MovieController extends Controller
         }
     }
 
+    public function sheets()
+    {
+        $sheets = Sheet::all();
+        return view('sheets', ['sheets' => $sheets]);
+    }
 }

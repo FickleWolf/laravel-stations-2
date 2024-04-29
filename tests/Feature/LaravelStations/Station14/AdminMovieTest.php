@@ -106,7 +106,7 @@ class AdminMovieTest extends TestCase
 
         $response = $this->post('/admin/movies/store', $input);
 
-        $response->assertStatus(500);
+        $response->assertStatus(302);
         $this->assertDatabaseCount('movies', 0);
         $this->assertDatabaseCount('genres', 0);
     }
@@ -244,7 +244,7 @@ class AdminMovieTest extends TestCase
 
         $response = $this->patch('/admin/movies/'.$movie->id.'/update', $input);
 
-        $response->assertStatus(500);
+        $response->assertStatus(302);
         $this->assertDatabaseMissing('movies', ['title' => $input['title']]);
         $this->assertDatabaseMissing('genres', ['name' => $input['genre']]);
     }

@@ -18,6 +18,8 @@ Route::get('/getPractice', [PracticeController::class, 'getPractice']);
 
 Route::get('/movies', [MovieController::class, 'index']);
 
+Route::get('/movies/{id}', [MovieController::class, 'detail']);
+
 Route::get('/admin/movies', [MovieController::class, 'admin']);
 
 Route::get('/admin/movies/create', [MovieController::class, 'create']);
@@ -29,3 +31,5 @@ Route::get('/admin/movies/{id}/edit', [MovieController::class, 'edit']);
 Route::patch('/admin/movies/{id}/update',[MovieController::class, 'update']);
 
 Route::delete('/admin/movies/{id}/destroy',[MovieController::class, 'destroy']);
+
+Route::get('/sheets', [MovieController::class, 'sheets']);

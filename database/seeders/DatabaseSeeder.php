@@ -15,5 +15,6 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         Movie::factory(100)->create();
+        $this->call(SheetTableSeeder::class);
     }
 }

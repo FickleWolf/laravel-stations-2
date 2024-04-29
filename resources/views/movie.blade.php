@@ -29,6 +29,7 @@
                 <div>
                     <p>{{ $movie->title }}</p>
                     <img src='{{ $movie->image_url }}' alt="{{ $movie->title }}">
+                    <a href='/movies/{{ $movie->id }}'>詳細</a>
                 </div>
             @endforeach
             {{ $movies->links() }} <!-- ページネーションリンクを表示 -->
