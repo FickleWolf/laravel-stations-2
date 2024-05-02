@@ -44,9 +44,10 @@
                     <td>{{ ($movie->is_showing) ? '上映中' : '上映予定' }}</td>
                     <td>{{ $movie->description }}</td>
                     <td><img src='{{ $movie->image_url }}' id="movie_image"/></td>
+                    <td><a href='/admin/movies/{{ $movie->id }}'>詳細</a></td>
                     <td><a href='/admin/movies/{{ $movie->id }}/edit'>編集</a></td>
                     <td>
-                        <form action="/admin/movies/1000/destroy" method="POST" onsubmit="return confirmAction()">
+                        <form action="/admin/movies/{{ $movie->id }}/destroy" method="POST" onsubmit="return confirmAction()">
                             @csrf
                             @method('DELETE')
                             <button type="submit">削除</button>
