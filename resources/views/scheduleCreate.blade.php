@@ -17,21 +17,22 @@
     <h1>スケジュール作成</h1>
     <form action="/admin/movies/{{$movie_id}}/schedules/store" method="POST">
         @csrf
+        <input type="hidden" name="movie_id" value="{{$movie_id}}">
         <div>
-            <label for="start_date">開始日付:</label>
-            <input type="date" id="start_date" name="start_date" required>
+            <label for="start_time_date">開始日付:</label>
+            <input type="date" id="start_time_date" name="start_time_date" required>
         </div>
         <div>
-            <label for="start_time">開始時刻:</label>
-            <input type="time" id="start_time" name="start_time" required>
+            <label for="start_time_time">開始時刻:</label>
+            <input type="time" id="start_time_time" name="start_time_time" required>
         </div>
         <div>
-            <label for="end_date">終了日付:</label>
-            <input type="date" id="end_date" name="end_date" required>
+            <label for="end_time_date">終了日付:</label>
+            <input type="date" id="end_time_date" name="end_time_date" required>
         </div>
         <div>
-            <label for="end_time">終了時刻:</label>
-            <input type="time" id="end_time" name="end_time" required>
+            <label for="end_time_time">終了時刻:</label>
+            <input type="time" id="end_time_time" name="end_time_time" required>
         </div>
         <button type="submit">スケジュール作成</button>
     </form>

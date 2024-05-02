@@ -47,8 +47,11 @@ class ScheduleTest extends TestCase
         $response->assertStatus(200);
 
         foreach ($movie->schedules as $schedule) {
-            $response->assertSeeText($schedule->start_time->format('H:i'));
-            $response->assertSeeText($schedule->end_time->format('H:i'));
+            $startTime = Carbon::parse($schedule->start_time)->format('H:i');
+            $endTime = Carbon::parse($schedule->end_time)->format('H:i');
+
+            $response->assertSeeText($startTime);
+            $response->assertSeeText($endTime);
         }
     }
 

@@ -34,6 +34,7 @@
     <img src="{{ $movie->image_url }}" alt="{{ $movie->title }}">
     <p><strong>公開年:</strong> {{ $movie->published_year }}</p>
     <p><strong>ジャンル:</strong> {{ $movie->genre->name }}</p>
+    <p><strong>上映状況:</strong>{{ ($movie->is_showing) ? '上映中' : '上映予定' }}</p>
     <p><strong>概要:</strong> {{ $movie->description }}</p>
 
     <h2>上映スケジュール</h2>
@@ -48,8 +49,8 @@
         <tbody>
         @foreach ($schedules as $schedule)
         <tr>
-            <td>{{\Carbon\Carbon::parse($schedule->start_time)->format('H:i')}}</td>
-            <td>{{\Carbon\Carbon::parse($schedule->end_time)->format('H:i')}}</td>
+            <td>{{$schedule->start_time}}</td>
+            <td>{{$schedule->end_time}}</td>
             <td><a href='/admin/schedules/{{$schedule->id}}'>詳細</a></td>
         </tr>
         @endforeach

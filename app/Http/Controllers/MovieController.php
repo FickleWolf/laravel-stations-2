@@ -177,24 +177,26 @@ class MovieController extends Controller
     public function scheduleStore(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'start_date' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'end_date' => 'required|date',
-            'end_time' => 'required|date_format:H:i',
+            'movie_id' => 'required',
+            'start_time_date' => 'required|date_format:Y-m-d',
+            'start_time_time' => 'required|date_format:H:i',
+            'end_time_date' => 'required|date_format:Y-m-d',
+            'end_time_time' => 'required|date_format:H:i',
         ]);
 
         try {
             $schedule = new Schedule();
-            $schedule->movie_id = $id;
-            $schedule->start_time = $validatedData['start_date'] . ' ' . $validatedData['start_time'];
-            $schedule->end_time = $validatedData['end_date'] . ' ' . $validatedData['end_time'];
+            $schedule->movie_id = $validatedData['movie_id'];
+            $schedule->start_time = $validatedData['start_time_date'] . ' ' . $validatedData['start_time_time']; // start_time_dateを修正
+            $schedule->end_time = $validatedData['end_time_date'] . ' ' . $validatedData['end_time_time']; // end_time_dateを修正
             $schedule->save();
 
-            return redirect('/admin/movies/' . $id)->with('success', 'スケジュールが正常に作成されました。');
+            return redirect('/admin/movies/' . $id)->with('success', 'スケジュールが正常に作成されました。'); // リダイレクト時のパラメータを修正
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => 'スケジュールの作成中にエラーが発生しました。']);
         }
     }
+
 
     public function scheduleDetail($id)
     {
@@ -211,16 +213,18 @@ class MovieController extends Controller
     public function scheduleUpdate(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'start_date' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'end_date' => 'required|date',
-            'end_time' => 'required|date_format:H:i',
+            'movie_id' => 'required',
+            'start_time_date' => 'required|date_format:Y-m-d',
+            'start_time_time' => 'required|date_format:H:i',
+            'end_time_date' => 'required|date_format:Y-m-d',
+            'end_time_time' => 'required|date_format:H:i',
         ]);
 
         try {
             $schedule = Schedule::findOrFail($id);
-            $schedule->start_time = $validatedData['start_date'] . ' ' . $validatedData['start_time'];
-            $schedule->end_time = $validatedData['end_date'] . ' ' . $validatedData['end_time'];
+            $schedule->start_time = $validatedData['start_time_date'] . ' ' . $validatedData['start_time_time'];
+            $schedule->end_time = $validatedData['end_time_date'] . ' ' . $validatedData['end_time_time'];
+
             $schedule->save();
 
             return redirect('/admin/movies/' . $schedule->movie_id)->with('success', 'スケジュールの更新が正常に完了しました。');
