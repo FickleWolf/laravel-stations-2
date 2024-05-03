@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use App\Models\Movie;
 use App\Models\Genre;
 use App\Models\Sheet;
@@ -139,7 +140,7 @@ class MovieController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
 
-            return back()->withInput()->withErrors(['error' => '映画の更新中にエラーが発生しました。']);
+            return back()->with(['error' => '映画の更新中にエラーが発生しました。']);
         }
     }
 
@@ -178,22 +179,39 @@ class MovieController extends Controller
     {
         $validatedData = $request->validate([
             'movie_id' => 'required',
-            'start_time_date' => 'required|date_format:Y-m-d',
-            'start_time_time' => 'required|date_format:H:i',
-            'end_time_date' => 'required|date_format:Y-m-d',
-            'end_time_time' => 'required|date_format:H:i',
+            'start_time_date' => 'required|date_format:Y-m-d|before:end_time_date',
+            'start_time_time' => 'required|date_format:H:i|before:end_time_time',
+            'end_time_date' => 'required|date_format:Y-m-d|after:start_time_date',
+            'end_time_time' => 'required|date_format:H:i|after:start_time_time',
+        ], [
+            'start_time_date.before' => '開始日付は終了日付より前に設定してください。',
+            'start_time_time.before' => '開始時間は終了時間より前に設定してください。',
+            'end_time_date.after' => '終了日付は開始日付より後に設定してください。',
+            'end_time_time.after' => '終了時間は開始時間より後に設定してください。',
         ]);
+
+        $start_time_time = Carbon::parse($validatedData['start_time_time']);
+        $end_time_time = Carbon::parse($validatedData['end_time_time']);
+        $start_time_time_plus_5_minutes = clone $start_time_time;
+        $start_time_time_plus_5_minutes->add(new \DateInterval('PT5M'));
+
+        if ($start_time_time_plus_5_minutes > $end_time_time) {
+            return back()->withInput()->withErrors([
+                'start_time_time' => '開始時刻と終了時刻の差は5分以上である必要があります。',
+                'end_time_time' => '開始時刻と終了時刻の差は5分以上である必要があります。',
+            ]);
+        }
 
         try {
             $schedule = new Schedule();
             $schedule->movie_id = $validatedData['movie_id'];
-            $schedule->start_time = $validatedData['start_time_date'] . ' ' . $validatedData['start_time_time']; // start_time_dateを修正
-            $schedule->end_time = $validatedData['end_time_date'] . ' ' . $validatedData['end_time_time']; // end_time_dateを修正
+            $schedule->start_time = $validatedData['start_time_date'] . ' ' . $validatedData['start_time_time'];
+            $schedule->end_time = $validatedData['end_time_date'] . ' ' . $validatedData['end_time_time'];
             $schedule->save();
 
-            return redirect('/admin/movies/' . $id)->with('success', 'スケジュールが正常に作成されました。'); // リダイレクト時のパラメータを修正
+            return redirect('/admin/movies/' . $id)->with('success', 'スケジュールが正常に作成されました。');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'スケジュールの作成中にエラーが発生しました。']);
+            return back()->with(['error' => 'スケジュールの作成中にエラーが発生しました。']);
         }
     }
 
@@ -229,7 +247,7 @@ class MovieController extends Controller
 
             return redirect('/admin/movies/' . $schedule->movie_id)->with('success', 'スケジュールの更新が正常に完了しました。');
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'スケジュールの更新中にエラーが発生しました。']);
+            return back()->with(['error' => 'スケジュールの更新中にエラーが発生しました。']);
         }
     }
 
@@ -243,7 +261,7 @@ class MovieController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['error' => '指定されたスケジュールが見つかりませんでした。'], 404);
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => 'スケジュールの削除中にエラーが発生しました。']);
+            return back()->with(['error' => 'スケジュールの削除中にエラーが発生しました。']);
         }
     }
 

@@ -34,6 +34,13 @@
             <label for="end_time_time">終了時刻:</label>
             <input type="time" id="end_time_time" name="end_time_time" required>
         </div>
+        @if ($errors->any())
+            <div class="alert alert-error">
+                @foreach ($errors->all() as $error)
+                    <div>{{ $error }}</div>
+                @endforeach
+            </div>
+        @endif
         <button type="submit">スケジュール作成</button>
     </form>
 </body>

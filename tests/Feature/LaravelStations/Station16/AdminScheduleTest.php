@@ -69,10 +69,10 @@ class AdminScheduleTest extends TestCase
     public function test管理者映画スケジュール作成画面でスケジュールが作成されるか(): void
     {
         $startTime = new CarbonImmutable('2022-01-01 00:00:00');
-        $endTime = new CarbonImmutable('2022-01-01 02:00:00');
+        $endTime = new CarbonImmutable('2022-01-02 02:00:00');
         $this->assertScheduleCount(0);
         $movieId = $this->createMovie('タイトル')->id;
-        $response = $this->post('/admin/movies/'.$movieId.'/schedules/store', [
+        $response = $this->post('/admin/movies/' . $movieId . '/schedules/store', [
             'movie_id' => $movieId,
             'start_time_date' => $startTime->format('Y-m-d'),
             'start_time_time' => $startTime->format('H:i'),
@@ -268,8 +268,8 @@ class AdminScheduleTest extends TestCase
                 [
                     'start_time_date' => '2022-12-30',
                     'start_time_time' => '14:00',
-                    'end_time_date' => '2022-12-30',
-                    'end_time_time' => '14:05',
+                    'end_time_date' => '2022-12-31',
+                    'end_time_time' => '14:00',
                 ],
                 ['start_time_time', 'end_time_time'],
             ],
